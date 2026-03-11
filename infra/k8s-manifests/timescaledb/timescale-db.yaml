@@ -8,7 +8,7 @@ spec:
       nodePort: 30432
   selector:
     app: timescaledb
-  type: NodePort # Chỉ cho phép nội bộ K8s truy cập để bảo mật
+  type: NodePort 
 ---
 apiVersion: apps/v1
 kind: Deployment
