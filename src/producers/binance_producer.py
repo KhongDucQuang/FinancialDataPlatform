@@ -17,11 +17,11 @@ producer = KafkaProducer(
 )
 
 def message_handler(message):
-    """Callback xử lý dữ liệu khi nhận được từ Binance"""
+    """Callback function to process data received from Binance"""
     try:
         if 'k' in message:
             kline = message['k']
-            # Chỉ lấy nến đã đóng (x: True) hoặc lấy liên tục để vẽ chart real-time
+            # Only take closed candles (x: True) or take continuously for real-time chart
             data = {
                 "symbol": message['s'],
                 "event_time": message['E'],
@@ -36,19 +36,19 @@ def message_handler(message):
             }
             
             producer.send(TOPIC_NAME, value=data)
-            logging.info(f"Đã bắn vào Redpanda: {data['symbol']} - Giá: {data['close']}")
+            logging.info(f"Sent to Redpanda: {data['symbol']} - Price: {data['close']}")
             
     except Exception as e:
-        logging.error(f"Lỗi xử lý message: {e}")
+        logging.error(f"Error processing message: {e}")
 
 SYMBOLS = ['btcusdt', 'ethusdt', 'solusdt', 'bnbusdt', 'adausdt']
 INTERVAL = '1m'
 
-# Websocket Client
+# WebSocket Client
 ws_client = SpotWebsocketClient(on_message=message_handler)
 
 for symbol in SYMBOLS:
     ws_client.kline(symbol=symbol, interval=INTERVAL)
-    logging.info(f"--- Đã đăng ký stream cho: {symbol.upper()} tại khung {INTERVAL} ---")
+    logging.info(f"--- Stream registered for: {symbol.upper()} at interval {INTERVAL} ---")
 
-print(f"--- Đang mở đường ống WebSocket cho {len(SYMBOLS)} cặp tiền sang {KAFKA_SERVER} ---")
+print(f"--- Opening WebSocket pipeline for {len(SYMBOLS)} trading pairs to {KAFKA_SERVER} ---")
