@@ -18,12 +18,19 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
           - |
-            pip install binance-connector kafka-python;
-            apt-get update && apt-get install -y curl;
-            curl -sSL https://raw.githubusercontent.com/KhongDucQuang/FinancialDataPlatform/main/src/producers/binance_producer.py -o binance_producer.py;
-            python binance_producer.py
+            set -e 
+            
+            echo "--- Installing dependencies ---"
+            pip install --no-cache-dir binance-connector kafka-python
+            
+            echo "--- Downloading code from GitHub ---"
+            apt-get update && apt-get install -y curl
+            curl -sSL https://raw.githubusercontent.com/<YOUR_USER>/<YOUR_REPO>/main/src/producers/binance_producer.py -o binance_producer.py
+            
+            echo "--- Starting the Bot ---"
+            python -u binance_producer.py
         env:
         - name: KAFKA_SERVER
           value: "redpanda:9092"
         - name: PYTHONUNBUFFERED
-          value: "1" 
+          value: "1"
