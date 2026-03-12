@@ -3,8 +3,10 @@ executor: "LocalExecutor"
 webserver:
   service:
     type: NodePort
-    nodePort: 30080
-
+    ports:
+      - name: airflow-ui
+        port: 8080
+        nodePort: 30080
 redis:
   enabled: false
 flower:
