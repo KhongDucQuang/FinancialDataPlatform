@@ -3,9 +3,9 @@ executor: "LocalExecutor"
 postgresql:
   enabled: true
   image:
-    repository: postgres
-    tag: "13-alpine"
-    pullPolicy: IfNotPresent
+    registry: docker.io
+    repository: bitnamilegacy/postgresql
+    tag: "16.1.0-debian-11-r15" 
   auth:
     database: airflow
     username: airflow
