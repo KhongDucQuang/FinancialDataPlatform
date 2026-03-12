@@ -5,7 +5,7 @@ postgresql:
   image:
     registry: docker.io
     repository: bitnami/postgresql
-    tag: "16.4.0" # Dùng bản mới hơn và chắc chắn tồn tại
+    tag: "16" # Dùng bản mới hơn và chắc chắn tồn tại
   auth:
     database: airflow
     username: airflow
