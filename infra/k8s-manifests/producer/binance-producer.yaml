@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: binance-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: binance-producer
+  template:
+    metadata:
+      labels:
+        app: binance-producer
+    spec:
+      containers:
+      - name: producer
+        image: python:3.9-slim
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            pip install binance-connector kafka-python;
+            apt-get update && apt-get install -y curl;
+            curl -sSL https://raw.githubusercontent.com/KhongDucQuang/FinancialDataPlatform/main/src/producers/binance_producer.py -o binance_producer.py;
+            python binance_producer.py
+        env:
+        - name: KAFKA_SERVER
+          value: "redpanda:9092"
+        - name: PYTHONUNBUFFERED
+          value: "1" 
