@@ -2,12 +2,16 @@ executor: "LocalExecutor"
 
 webserver:
   enabled: true
+  replicas: 1
   service:
     type: NodePort
     ports:
       - name: airflow-ui
         port: 8080
         nodePort: 30080
+
+apiServer:
+  enabled: true
 
 # Cấu hình Git Sync (HTTPS cho Public Repo)
 dags:
