@@ -2,7 +2,10 @@ executor: "LocalExecutor"
 
 postgresql:
   enabled: true
-
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: 15
 webserver:
   enabled: true
   service:
