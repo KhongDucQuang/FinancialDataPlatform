@@ -3,9 +3,9 @@ executor: "LocalExecutor"
 postgresql:
   enabled: true
   image:
-    registry: docker.io
-    repository: bitnami/postgresql
-    tag: "16" # Dùng bản mới hơn và chắc chắn tồn tại
+    repository: postgres
+    tag: "13-alpine"
+    pullPolicy: IfNotPresent
   auth:
     database: airflow
     username: airflow
