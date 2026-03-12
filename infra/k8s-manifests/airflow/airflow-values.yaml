@@ -2,7 +2,6 @@ executor: "LocalExecutor"
 
 webserver:
   enabled: true
-  replicas: 1
   service:
     type: NodePort
     ports:
@@ -10,29 +9,22 @@ webserver:
         port: 8080
         nodePort: 30080
 
-apiServer:
-  enabled: true
-
-# Cấu hình Git Sync (HTTPS cho Public Repo)
 dags:
   gitSync:
     enabled: true
-    # Sử dụng link HTTPS thay vì SSH
-    repo: "https://github.com/KhongDucQuang/FinancialDataPlatform.git" 
+    repo: "https://github.com/KhongDucQuang/FinancialDataPlatform.git"
     branch: "main"
     rev: "HEAD"
     depth: 1
     wait: 30
     subPath: "src/dags"
-  
   persistence:
     enabled: false
 
-# Metadata DB cho Airflow
 postgresql:
   enabled: true
 
-# Tắt các thành phần thừa để máy chạy nhẹ
+# Tắt các thành phần thừa để dồn RAM cho Spark sau này
 redis: {enabled: false}
 flower: {enabled: false}
 statsd: {enabled: false}
