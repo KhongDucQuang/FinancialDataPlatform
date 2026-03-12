@@ -5,6 +5,7 @@ postgresql:
   image:
     repository: postgres
     tag: "13"
+    pullPolicy: IfNotPresent
 
 webserver:
   enabled: true
@@ -26,9 +27,6 @@ dags:
     subPath: "src/dags"
   persistence:
     enabled: false
-
-postgresql:
-  enabled: true
 
 # Tắt các thành phần thừa để dồn RAM cho Spark sau này
 redis: {enabled: false}
