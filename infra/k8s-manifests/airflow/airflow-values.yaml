@@ -1,0 +1,18 @@
+executor: "LocalExecutor"
+
+webserver:
+  service:
+    type: NodePort
+    nodePort: 30080
+
+redis:
+  enabled: false
+flower:
+  enabled: false
+
+postgresql:
+  enabled: true
+
+dags:
+  gitSync:
+    enabled: true
