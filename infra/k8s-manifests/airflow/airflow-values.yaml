@@ -14,12 +14,12 @@ dags:
   gitSync:
     enabled: true
     # Sử dụng link HTTPS thay vì SSH
-    repo: "https://github.com/USERNAME/REPO_NAME.git" # THAY LINK REPO CỦA BẠN VÀO ĐÂY
+    repo: "https://github.com/KhongDucQuang/FinancialDataPlatform.git" 
     branch: "main"
     rev: "HEAD"
     depth: 1
     wait: 30
-    subPath: "src/dags" # Đường dẫn đến thư mục chứa file .py trong repo
+    subPath: "src/dags"
   
   persistence:
     enabled: false
