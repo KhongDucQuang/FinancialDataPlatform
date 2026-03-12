@@ -25,7 +25,7 @@ spec:
             
             echo "--- Downloading code from GitHub ---"
             apt-get update && apt-get install -y curl
-            curl -sSL https://raw.githubusercontent.com/<YOUR_USER>/<YOUR_REPO>/main/src/producers/binance_producer.py -o binance_producer.py
+            curl -sSL https://raw.githubusercontent.com/KhongDucQuang/FinancialDataPlatform/main/src/producers/binance_producer.py -o binance_producer.py
             
             echo "--- Starting the Bot ---"
             python -u binance_producer.py
