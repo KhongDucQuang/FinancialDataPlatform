@@ -1,20 +1,34 @@
 executor: "LocalExecutor"
 
 webserver:
+  enabled: true
   service:
     type: NodePort
     ports:
       - name: airflow-ui
         port: 8080
         nodePort: 30080
-redis:
-  enabled: false
-flower:
-  enabled: false
 
-postgresql:
-  enabled: true
-
+# Cấu hình Git Sync (HTTPS cho Public Repo)
 dags:
   gitSync:
     enabled: true
+    # Sử dụng link HTTPS thay vì SSH
+    repo: "https://github.com/USERNAME/REPO_NAME.git" # THAY LINK REPO CỦA BẠN VÀO ĐÂY
+    branch: "main"
+    rev: "HEAD"
+    depth: 1
+    wait: 30
+    subPath: "src/dags" # Đường dẫn đến thư mục chứa file .py trong repo
+  
+  persistence:
+    enabled: false
+
+# Metadata DB cho Airflow
+postgresql:
+  enabled: true
+
+# Tắt các thành phần thừa để máy chạy nhẹ
+redis: {enabled: false}
+flower: {enabled: false}
+statsd: {enabled: false}
