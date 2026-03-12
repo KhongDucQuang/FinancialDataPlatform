@@ -18,17 +18,21 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
           - |
-            set -e 
-            
-            echo "--- Installing dependencies ---"
-            pip install --no-cache-dir binance-connector kafka-python
-            
-            echo "--- Downloading code from GitHub ---"
+            set -e
+            echo "--- 1. Updating system & Installing tools ---"
             apt-get update && apt-get install -y curl
-            curl -sSL https://raw.githubusercontent.com/KhongDucQuang/FinancialDataPlatform/main/src/producers/binance_producer.py -o binance_producer.py
             
-            echo "--- Starting the Bot ---"
-            python -u binance_producer.py
+            echo "--- 2. Installing libraries (specific versions) ---"
+            python3 -m pip install --no-cache-dir websocket-client binance-connector kafka-python
+            
+            echo "--- 3. Checking installed libraries ---"
+            python3 -m pip list | grep binance
+            
+            echo "--- 4. Downloading code from GitHub ---"
+            curl -sSL https://raw.githubusercontent.com/KhongDucQuang/FinancialDataPlatform/main/src/producers/binance_producer.py -o /tmp/binance_producer.py
+            
+            echo "--- 5. Starting the Bot ---"
+            cd /tmp && python3 -u binance_producer.py
         env:
         - name: KAFKA_SERVER
           value: "redpanda:9092"
