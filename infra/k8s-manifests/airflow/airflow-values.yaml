@@ -2,10 +2,6 @@ executor: "LocalExecutor"
 
 postgresql:
   enabled: true
-  image:
-    repository: postgres
-    tag: "13"
-    pullPolicy: IfNotPresent
 
 webserver:
   enabled: true
