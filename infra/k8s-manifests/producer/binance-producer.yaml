@@ -20,7 +20,7 @@ spec:
           - |
             set -e
             pip install --no-cache-dir python-binance kafka-python
-            curl -sSL https://raw.githubusercontent.com/<YOUR_USER>/<YOUR_REPO>/main/src/producers/binance_producer.py -o binance_producer.py
+            curl -sSL https://raw.githubusercontent.com/KhongDucQuang/FinancialDataPlatform/main/src/producers/binance_producer.py -o binance_producer.py
             python -u binance_producer.py
         resources:
           requests:
