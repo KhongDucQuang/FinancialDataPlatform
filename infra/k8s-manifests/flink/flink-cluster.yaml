@@ -18,6 +18,3 @@ spec:
     resource:
       memory: "1600m" 
       cpu: 1
-  job:
-    jarURI: local:///opt/flink/examples/streaming/TopSpeedWindowing.jar
-    parallelism: 1
