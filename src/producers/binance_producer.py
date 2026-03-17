@@ -1,7 +1,6 @@
 import os
 import json
 import logging
-import time
 from binance import ThreadedWebsocketManager
 from kafka import KafkaProducer
 
@@ -11,7 +10,6 @@ KAFKA_SERVER = os.getenv('KAFKA_SERVER', 'redpanda:9092')
 TOPIC_NAME = 'binance_raw_kline'
 SYMBOLS = ['btcusdt', 'ethusdt', 'solusdt', 'bnbusdt', 'adausdt']
 
-# Khởi tạo Kafka Producer
 producer = KafkaProducer(
     bootstrap_servers=[KAFKA_SERVER],
     value_serializer=lambda x: json.dumps(x).encode('utf-8'),
@@ -19,23 +17,26 @@ producer = KafkaProducer(
 )
 
 def handle_socket_message(msg):
-    """Xử lý dữ liệu nến từ WebSocket"""
     try:
         if msg['e'] == 'kline':
             k = msg['k']
+
             data = {
                 "symbol": msg['s'],
                 "open_time": k['t'],
                 "close_time": k['T'],
-                "open": k['o'],
-                "high": k['h'],
-                "low": k['l'],
-                "close": k['c'],
-                "volume": k['v'],
+                "open_price": float(k['o']),
+                "high_price": float(k['h']),
+                "low_price": float(k['l']),
+                "close_price": float(k['c']),
+                "volume": float(k['v']),
+
                 "is_closed": k['x']
             }
+
             producer.send(TOPIC_NAME, value=data)
-            logging.info(f"Pushed: {data['symbol']} - Price: {data['close']}")
+            logging.info(f"Pushed: {data['symbol']} - Price: {data['close_price']}")
+
     except Exception as e:
         logging.error(f"Error processing message: {e}")
 
@@ -45,8 +46,12 @@ def main():
 
     logging.info(f"--- Starting WebSocket for {len(SYMBOLS)} symbols ---")
     for symbol in SYMBOLS:
-        twm.start_kline_socket(callback=handle_socket_message, symbol=symbol, interval='1m')
-    
+        twm.start_kline_socket(
+            callback=handle_socket_message,
+            symbol=symbol,
+            interval='1m'
+        )
+
     twm.join()
 
 if __name__ == "__main__":
