@@ -20,3 +20,6 @@ spec:
       cpu: 1
   service:
     type: NodePort
+  job:
+    jarURI: local:///opt/flink/examples/streaming/TopSpeedWindowing.jar
+    parallelism: 1
