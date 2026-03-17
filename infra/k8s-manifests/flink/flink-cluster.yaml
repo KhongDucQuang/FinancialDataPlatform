@@ -2,18 +2,19 @@ apiVersion: flink.apache.org/v1beta1
 kind: FlinkDeployment
 metadata:
   name: binance-flink-cluster
-  namespace: airflow 
+  namespace: airflow
 spec:
-  image: flink:1.18 
+  image: flink:1.18
   flinkVersion: v1_18
   flinkConfiguration:
     taskmanager.numberOfTaskSlots: "2"
   serviceAccount: flink
   jobManager:
     resource:
-      memory: "1024m"
+      memory: "800m"  
       cpu: 1
   taskManager:
+    replicas: 1       
     resource:
-      memory: "2048m"
+      memory: "1600m" 
       cpu: 1
