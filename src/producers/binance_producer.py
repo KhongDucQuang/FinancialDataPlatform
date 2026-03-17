@@ -6,12 +6,13 @@ from kafka import KafkaProducer
 
 logging.basicConfig(level=logging.INFO)
 
-KAFKA_SERVER = os.getenv('KAFKA_SERVER', 'redpanda:9092')
+KAFKA_SERVER = os.getenv('KAFKA_SERVER', 'redpanda.default.svc.cluster.local:9092')
 TOPIC_NAME = 'binance_raw_kline'
 SYMBOLS = ['btcusdt', 'ethusdt', 'solusdt', 'bnbusdt', 'adausdt']
 
 producer = KafkaProducer(
     bootstrap_servers=[KAFKA_SERVER],
+    value_serializer=lambda v: json.dumps(v).encode('utf-8'), 
     acks=1,
     linger_ms=5,
     batch_size=16384
@@ -34,10 +35,7 @@ def handle_socket_message(msg):
                 "is_closed": k['x']
             }
 
-            producer.send(
-                TOPIC_NAME,
-                value=json.dumps(data).encode('utf-8')
-            )
+            producer.send(TOPIC_NAME, value=data)
 
             logging.info(f"Pushed: {data['symbol']} - {data['close_price']}")
 
