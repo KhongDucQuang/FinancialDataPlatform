@@ -4,7 +4,7 @@ metadata:
   name: binance-flink-cluster
   namespace: airflow
 spec:
-  image: khongducquang/flink:1.18-custom
+  image: khongducquang/flink:1.18-custom-v2
   flinkVersion: v1_18
   flinkConfiguration:
     taskmanager.numberOfTaskSlots: "2"
