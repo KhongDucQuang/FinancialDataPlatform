@@ -8,13 +8,16 @@ spec:
   flinkVersion: v1_18
   flinkConfiguration:
     taskmanager.numberOfTaskSlots: "2"
+    jobmanager.memory.process.size: "1000m"
+    taskmanager.memory.process.size: "2000m"
+    resourcemanager.taskmanager-timeout: "30000"
   serviceAccount: flink
   jobManager:
     resource:
-      memory: "800m"  
-      cpu: 1
+      memory: "1G"  
+      cpu: 0.5     
   taskManager:
     replicas: 1       
     resource:
-      memory: "1600m" 
-      cpu: 1
+      memory: "2G"  
+      cpu: 0.5
