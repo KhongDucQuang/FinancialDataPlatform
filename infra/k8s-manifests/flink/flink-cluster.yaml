@@ -8,6 +8,8 @@ spec:
   flinkVersion: v1_18
   flinkConfiguration:
     taskmanager.numberOfTaskSlots: "2"
+    high-availability.type: kubernetes
+    high-availability.storageDir: s3://unused
     jobmanager.memory.process.size: "1000m"
     taskmanager.memory.process.size: "2000m"
     resourcemanager.taskmanager-timeout: "30000"
