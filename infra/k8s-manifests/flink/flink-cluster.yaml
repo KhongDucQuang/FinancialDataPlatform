@@ -18,3 +18,5 @@ spec:
     resource:
       memory: "1600m" 
       cpu: 1
+  service:
+    type: NodePort
