@@ -12,13 +12,14 @@ SYMBOLS = ['btcusdt', 'ethusdt', 'solusdt', 'bnbusdt', 'adausdt']
 
 producer = KafkaProducer(
     bootstrap_servers=[KAFKA_SERVER],
-    value_serializer=lambda x: json.dumps(x).encode('utf-8'),
-    acks=1
+    acks=1,
+    linger_ms=5,
+    batch_size=16384
 )
 
 def handle_socket_message(msg):
     try:
-        if msg['e'] == 'kline':
+        if msg.get('e') == 'kline':
             k = msg['k']
 
             data = {
@@ -30,12 +31,15 @@ def handle_socket_message(msg):
                 "low_price": float(k['l']),
                 "close_price": float(k['c']),
                 "volume": float(k['v']),
-
                 "is_closed": k['x']
             }
 
-            producer.send(TOPIC_NAME, value=data)
-            logging.info(f"Pushed: {data['symbol']} - Price: {data['close_price']}")
+            producer.send(
+                TOPIC_NAME,
+                value=json.dumps(data).encode('utf-8')
+            )
+
+            logging.info(f"Pushed: {data['symbol']} - {data['close_price']}")
 
     except Exception as e:
         logging.error(f"Error processing message: {e}")
@@ -45,6 +49,7 @@ def main():
     twm.start()
 
     logging.info(f"--- Starting WebSocket for {len(SYMBOLS)} symbols ---")
+
     for symbol in SYMBOLS:
         twm.start_kline_socket(
             callback=handle_socket_message,
