@@ -24,9 +24,15 @@ spec:
     resource: { memory: "1024m", cpu: 1 }
 
   job:
-    jarURI: local:///opt/flink/usrlib/sql-runner.jar
-    entryClass: "org.apache.flink.table.client.SqlClient" 
+    # Sử dụng flink-dist có sẵn trong image, không cần sql-runner.jar nữa
+    jarURI: local:///opt/flink/lib/flink-dist-1.18.1.jar 
+    
+    # Class này là "vạn năng", nó sẽ tự tìm đến SQL Client cho bạn
+    entryClass: "org.apache.flink.client.python.PythonDriver"
+    
     args:
+      - "-py"
+      - "org.apache.flink.table.client.SqlClient"
       - "-f"
       - "/opt/flink/sql/binance_job.sql"
     parallelism: 1
