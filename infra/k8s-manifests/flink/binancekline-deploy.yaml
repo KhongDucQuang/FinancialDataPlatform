@@ -5,7 +5,7 @@ metadata:
   namespace: airflow
 spec:
   serviceAccount: flink-operator-sa
-  image: kdquangrepo/flink:1.18-custom-v3
+  image: khongducquang/flink:1.18-custom-v4
   flinkVersion: v1_18
   flinkConfiguration:
     state.checkpoints.dir: gs://flink-checkpoints-1773848181/checkpoints
@@ -24,10 +24,13 @@ spec:
     resource: { memory: "1024m", cpu: 1 }
 
   job:
-    jarURI: local:///opt/flink/bin/sql-gateway.sh 
-    args: ["/opt/flink/bin/sql-client.sh", "-f", "/opt/flink/sql/binance_job.sql"]
+    jarURI: local:///opt/flink/usrlib/sql-runner.jar
+    entryClass: "org.apache.flink.table.client.SqlClient" 
+    args:
+      - "-f"
+      - "/opt/flink/sql/binance_job.sql"
     parallelism: 1
-    upgradeMode: last-state
+    upgradeMode: stateless
 
   podTemplate:
     spec:
