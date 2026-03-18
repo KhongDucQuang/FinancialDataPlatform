@@ -4,6 +4,7 @@ metadata:
   name: binance-kline-app
   namespace: airflow
 spec:
+  serviceAccount: flink-operator-sa
   image: kdquangrepo/flink:1.18-custom-v3
   flinkVersion: v1_18
   flinkConfiguration:
