@@ -1,0 +1,29 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: airflow
+  name: flink-ha-role
+rules:
+# Quyền tương tác với Pods, Services, ConfigMaps, Events (Rất quan trọng cho HA)
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "events"]
+  verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+# Quyền tương tác với Leases (Dùng cho Leader Election của K8s)
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: flink-ha-role-binding
+  namespace: airflow
+subjects:
+- kind: ServiceAccount
+  name: flink-operator-sa # Đúng tên Service Account của bạn
+  namespace: airflow
+roleRef:
+  kind: Role
+  name: flink-ha-role
+  apiGroup: rbac.authorization.k8s.io
