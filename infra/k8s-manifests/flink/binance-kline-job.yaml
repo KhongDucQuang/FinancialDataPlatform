@@ -18,7 +18,7 @@ spec:
       memory: "1024m"
       cpu: 1
   job:
-    jarURI: local:///opt/flink/usrlib/sql-runner-1.0.jar # Đường dẫn file JAR bên trong image
+    jarURI: local:///opt/flink/usrlib/sql-runner.jar # Đường dẫn file JAR bên trong image
     entryClass: com.mycompany.flink.SqlRunner
     args: ["/opt/flink/sql/binance_job.sql"] # Truyền file SQL tương ứng cho Job này
     parallelism: 1
