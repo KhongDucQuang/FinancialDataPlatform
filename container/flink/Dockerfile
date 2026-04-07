@@ -24,11 +24,18 @@ RUN wget -q https://repo1.maven.org/maven2/org/apache/flink/flink-avro/1.18.1/fl
 
 # --- 2. Đưa file SQL Runner do bạn code vào image (vào thư mục /usrlib) ---
 WORKDIR /opt/flink/usrlib
-
-# XÓA dòng wget cũ và thay bằng lệnh COPY này
-# Lệnh này sẽ copy file JAR từ máy thật của bạn vào image
 COPY sql-runner-1.0.jar /opt/flink/usrlib/sql-runner.jar
 
-RUN chown -R flink:flink /opt/flink/lib /opt/flink/usrlib
+# --- 3. Đưa các file SQL Job vào image (vào thư mục /sql) ---
+# Tạo thư mục sql
+RUN mkdir -p /opt/flink/sql
 
+# Copy TẤT CẢ các file .sql từ máy bạn (nằm cùng thư mục Dockerfile) vào image
+# Cách này tiện vì sau này bạn có job2.sql, job3.sql nó cũng tự động copy hết
+COPY *.sql /opt/flink/sql/
+
+# Cấp lại quyền cho user flink để không bị lỗi permission denied
+RUN chown -R flink:flink /opt/flink/lib /opt/flink/usrlib /opt/flink/sql
+
+# Trả lại quyền cho user flink chạy ứng dụng
 USER flink

@@ -4,19 +4,32 @@ metadata:
   name: binance-kline-job # Tên cụm Pod cho Job này
   namespace: airflow
 spec:
-  image: khongducquang/flink:1.18-custom-v7 # Image mới nhất chứa code có .await()
+  image: khongducquang/flink:1.18-custom-v8 # Image chứa đủ file JAR và file SQL
   flinkVersion: v1_18
+  serviceAccount: flink-operator-sa # Service account có quyền chạy Flink Operator
+  
   flinkConfiguration:
     taskmanager.numberOfTaskSlots: "2"
-  serviceAccount: flink # Đảm bảo bạn đã tạo service account này
+    # --- Cấu hình Checkpoint & HA với GCS ---
+    state.checkpoints.dir: gs://flink-checkpoints-1773848181/checkpoints
+    execution.checkpointing.interval: "10s"
+    execution.checkpointing.mode: "EXACTLY_ONCE"
+    state.backend.type: hashmap
+    google.cloud.auth.service.account.json.key.file: /etc/flink/gcp/gcs-key.json
+    fs.gs.project.id: "datn-489915"
+    high-availability.type: kubernetes
+    high-availability.storageDir: gs://flink-checkpoints-1773848181/ha
+
   jobManager:
     resource:
       memory: "1024m"
       cpu: 1
+
   taskManager:
     resource:
       memory: "1024m"
       cpu: 1
+
   job:
     jarURI: local:///opt/flink/usrlib/sql-runner.jar # Đường dẫn file JAR bên trong image
     entryClass: com.mycompany.flink.SqlRunner
