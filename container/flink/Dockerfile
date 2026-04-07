@@ -7,6 +7,9 @@ USER root
 # Cài đặt wget để tải các connector
 RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
 
+RUN mkdir -p /opt/flink/plugins/gs-fs-hadoop && \
+    cp /opt/flink/opt/flink-gs-fs-hadoop-*.jar /opt/flink/plugins/gs-fs-hadoop/
+    
 # --- 1. Cài đặt các SQL Connectors & Drivers (vào thư mục /lib) ---
 WORKDIR /opt/flink/lib
 
