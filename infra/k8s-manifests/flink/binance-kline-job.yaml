@@ -4,7 +4,7 @@ metadata:
   name: binance-kline-job # Tên cụm Pod cho Job này
   namespace: airflow
 spec:
-  image: khongducquang/flink:1.18-custom-v9 # Image chứa đủ file JAR và file SQL
+  image: khongducquang/flink:1.18-custom-v10 # Image chứa đủ file JAR và file SQL
   flinkVersion: v1_18
   serviceAccount: flink-operator-sa # Service account có quyền chạy Flink Operator
   
