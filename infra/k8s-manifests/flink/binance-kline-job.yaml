@@ -1,0 +1,25 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: binance-kline-job # Tên cụm Pod cho Job này
+  namespace: airflow
+spec:
+  image: khongducquang/flink:1.18-custom-v6 # Image mới nhất chứa code có .await()
+  flinkVersion: v1_18
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+  serviceAccount: flink # Đảm bảo bạn đã tạo service account này
+  jobManager:
+    resource:
+      memory: "1024m"
+      cpu: 1
+  taskManager:
+    resource:
+      memory: "1024m"
+      cpu: 1
+  job:
+    jarURI: local:///opt/flink/usrlib/sql-runner-1.0.jar # Đường dẫn file JAR bên trong image
+    entryClass: com.mycompany.flink.SqlRunner
+    args: ["/opt/flink/sql/binance_job.sql"] # Truyền file SQL tương ứng cho Job này
+    parallelism: 1
+    upgradeMode: stateless
