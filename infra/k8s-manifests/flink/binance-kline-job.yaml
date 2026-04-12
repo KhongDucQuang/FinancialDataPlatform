@@ -33,9 +33,9 @@ spec:
 
     # restart
     restart-strategy: failure-rate
-    restart-strategy.failure-rate.max-failures-per-interval: 3
-    restart-strategy.failure-rate.failure-rate-interval: 5 min
-    restart-strategy.failure-rate.delay: 10 s
+    restart-strategy.failure-rate.max-failures-per-interval: "3"
+    restart-strategy.failure-rate.failure-rate-interval: "5 min"
+    restart-strategy.failure-rate.delay: "10 s"
 
   jobManager:
     resource:
