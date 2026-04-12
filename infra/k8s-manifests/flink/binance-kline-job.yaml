@@ -21,10 +21,12 @@ spec:
     execution.checkpointing.min-pause: "5s"
     execution.checkpointing.timeout: "1m"
     execution.checkpointing.max-concurrent-checkpoints: "1"
+    execution.checkpointing.externalized-checkpoint-retention: "RETAIN_ON_CANCELLATION"
 
     # state backend
     state.backend.type: rocksdb
     state.backend.incremental: "true"
+    state.backend.rocksdb.memory.managed: "true"
     state.checkpoints.dir: gs://flink-checkpoints-1773848181/checkpoints
 
     # HA
@@ -36,6 +38,10 @@ spec:
     restart-strategy.failure-rate.max-failures-per-interval: "3"
     restart-strategy.failure-rate.failure-rate-interval: "5 min"
     restart-strategy.failure-rate.delay: "10 s"
+
+    # metrics
+    metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
+    metrics.reporter.prom.port: "9249"
 
   jobManager:
     resource:
@@ -51,5 +57,5 @@ spec:
     jarURI: local:///opt/flink/usrlib/sql-runner.jar 
     entryClass: com.mycompany.flink.SqlRunner
     args: ["/opt/flink/sql/binance_kline_job.sql"]
-    parallelism: 1
+    parallelism: 2
     upgradeMode: last-state
