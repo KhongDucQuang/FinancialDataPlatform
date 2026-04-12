@@ -1,24 +1,41 @@
 apiVersion: flink.apache.org/v1beta1
 kind: FlinkDeployment
 metadata:
-  name: binance-kline-job # Tên cụm Pod cho Job này
+  name: binance-kline-job 
   namespace: airflow
 spec:
-  image: khongducquang/flink:1.18-custom-v15 # Image chứa đủ file JAR và file SQL
+  image: khongducquang/flink:1.18-custom-v15 # image custome (jar and sql)
   flinkVersion: v1_18
-  serviceAccount: flink-operator-sa # Service account có quyền chạy Flink Operator
+  serviceAccount: flink-operator-sa 
   
   flinkConfiguration:
     taskmanager.numberOfTaskSlots: "2"
-    # --- Cấu hình Checkpoint & HA với GCS ---
-    state.checkpoints.dir: gs://flink-checkpoints-1773848181/checkpoints
-    execution.checkpointing.interval: "10s"
-    execution.checkpointing.mode: "EXACTLY_ONCE"
-    state.backend.type: hashmap
+    
+    #gcs
     google.cloud.auth.service.account.json.key.file: /etc/flink/gcp/gcs-key.json
     fs.gs.project.id: "datn-489915"
+
+    # checkpoint
+    execution.checkpointing.interval: "10s"
+    execution.checkpointing.mode: "EXACTLY_ONCE"
+    execution.checkpointing.min-pause: "5s"
+    execution.checkpointing.timeout: "1m"
+    execution.checkpointing.max-concurrent-checkpoints: "1"
+
+    # state backend
+    state.backend.type: rocksdb
+    state.backend.incremental: "true"
+    state.checkpoints.dir: gs://flink-checkpoints-1773848181/checkpoints
+
+    # HA
     high-availability.type: kubernetes
     high-availability.storageDir: gs://flink-checkpoints-1773848181/ha
+
+    # restart
+    restart-strategy: failure-rate
+    restart-strategy.failure-rate.max-failures-per-interval: 3
+    restart-strategy.failure-rate.failure-rate-interval: 5 min
+    restart-strategy.failure-rate.delay: 10 s
 
   jobManager:
     resource:
@@ -31,8 +48,8 @@ spec:
       cpu: 1
 
   job:
-    jarURI: local:///opt/flink/usrlib/sql-runner.jar # Đường dẫn file JAR bên trong image
+    jarURI: local:///opt/flink/usrlib/sql-runner.jar 
     entryClass: com.mycompany.flink.SqlRunner
-    args: ["/opt/flink/sql/binance_kline_job.sql"] # Truyền file SQL tương ứng cho Job này
+    args: ["/opt/flink/sql/binance_kline_job.sql"]
     parallelism: 1
-    upgradeMode: stateless
+    upgradeMode: last-state
