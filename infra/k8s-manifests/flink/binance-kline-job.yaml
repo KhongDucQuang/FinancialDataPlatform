@@ -4,7 +4,7 @@ metadata:
   name: binance-kline-job 
   namespace: airflow
 spec:
-  image: khongducquang/flink:1.18-custom-v15 # image custome (jar and sql)
+  image: khongducquang/flink:1.18-custom-v16 # image custome (jar and sql)
   flinkVersion: v1_18
   serviceAccount: flink-operator-sa 
   
