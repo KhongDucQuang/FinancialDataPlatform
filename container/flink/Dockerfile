@@ -7,14 +7,14 @@ USER root
 RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
 
 # =========================
-# Prometheus metrics vào /lib
+# Prometheus metrics → /plugins (đúng chuẩn)
 # =========================
-RUN wget -q -O /opt/flink/lib/flink-metrics-prometheus-1.18.1.jar \
-https://repo1.maven.org/maven2/org/apache/flink/flink-metrics-prometheus/1.18.1/flink-metrics-prometheus-1.18.1.jar
+RUN mkdir -p /opt/flink/plugins/metrics-prometheus && \
+    wget -q -O /opt/flink/plugins/metrics-prometheus/flink-metrics-prometheus-1.18.1.jar \
+    https://repo1.maven.org/maven2/org/apache/flink/flink-metrics-prometheus/1.18.1/flink-metrics-prometheus-1.18.1.jar
 
-# Xóa sạch prometheus khỏi plugins nếu có
-RUN rm -rf /opt/flink/plugins/metrics-prometheus || true
-RUN find /opt/flink/plugins -name "*prometheus*" -delete || true
+# Xóa sạch prometheus khỏi lib nếu có
+RUN rm -f /opt/flink/lib/flink-metrics-prometheus-*.jar || true
 
 # =========================
 # GCS connector (plugin đúng chuẩn)
