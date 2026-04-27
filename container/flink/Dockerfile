@@ -12,6 +12,10 @@ RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
 RUN wget -q -O /opt/flink/lib/flink-metrics-prometheus-1.18.1.jar \
 https://repo1.maven.org/maven2/org/apache/flink/flink-metrics-prometheus/1.18.1/flink-metrics-prometheus-1.18.1.jar
 
+# Xóa sạch prometheus khỏi plugins nếu có
+RUN rm -rf /opt/flink/plugins/metrics-prometheus || true
+RUN find /opt/flink/plugins -name "*prometheus*" -delete || true
+
 # =========================
 # GCS connector (plugin đúng chuẩn)
 # =========================
