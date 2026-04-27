@@ -4,7 +4,7 @@ metadata:
   name: binance-kline-job 
   namespace: airflow
 spec:
-  image: khongducquang/flink:1.18-custom-v16 # image custome (jar and sql)
+  image: khongducquang/flink:1.18-custom-v17 # image custome (jar and sql)
   flinkVersion: v1_18
   serviceAccount: flink-operator-sa 
   
@@ -40,6 +40,7 @@ spec:
     restart-strategy.failure-rate.delay: "10 s"
 
     # metrics
+    metrics.reporters: prom
     metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
     metrics.reporter.prom.port: "9249"
 
