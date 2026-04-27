@@ -43,6 +43,7 @@ spec:
     metrics.reporters: prom
     metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
     metrics.reporter.prom.port: "9249"
+    metrics.reporter.prom.host: "0.0.0.0"
 
   jobManager:
     resource:
