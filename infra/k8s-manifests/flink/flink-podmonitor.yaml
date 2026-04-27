@@ -1,0 +1,23 @@
+# flink-podmonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: flink-binance-kline-job
+  namespace: monitoring          # ← phải cùng namespace với Prometheus Operator
+  labels:
+    release: monitoring          # ← match podMonitorSelector ở bước 1
+spec:
+  namespaceSelector:
+    matchNames:
+      - airflow                  # namespace của Flink job
+  selector:
+    matchExpressions:
+      - key: component
+        operator: In
+        values:
+          - jobmanager
+          - taskmanager
+  podMetricsEndpoints:
+    - port: prom-metrics         # ← match tên port ở bước 2
+      path: /
+      interval: 15s

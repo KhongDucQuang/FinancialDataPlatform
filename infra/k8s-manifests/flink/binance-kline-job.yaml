@@ -44,6 +44,14 @@ spec:
     metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporter
     metrics.reporter.prom.port: "9249"
     metrics.reporter.prom.host: "0.0.0.0"
+  
+  podTemplate:
+    spec:
+      containers:
+        - name: flink-main-container
+          ports:
+            - name: prom-metrics     # ← PodMonitor sẽ reference tên này
+              containerPort: 9249
 
   jobManager:
     resource:
@@ -54,6 +62,13 @@ spec:
     resource:
       memory: "1024m"
       cpu: 1
+    podTemplate:
+      spec:
+        containers:
+          - name: flink-main-container
+            ports:
+              - name: prom-metrics   # ← giống JM
+                containerPort: 9249
 
   job:
     jarURI: local:///opt/flink/usrlib/sql-runner.jar 
