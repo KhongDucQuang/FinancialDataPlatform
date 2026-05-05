@@ -63,6 +63,25 @@ CREATE TABLE pattern_alerts_sink (
   'sink.buffer-flush.max-rows' = '1' -- Alert cần ghi ngay lập tức
 );
 
+-- BẢNG ĐÍCH 3: Technical Indicators
+CREATE TABLE technical_indicators_sink (
+  symbol       STRING,
+  open_time    BIGINT,
+  close_price  DOUBLE,
+  sma7         DOUBLE,
+  sma25        DOUBLE,
+  PRIMARY KEY (symbol, open_time) NOT ENFORCED
+) WITH (
+  'connector' = 'jdbc',
+  'url' = 'jdbc:postgresql://timescaledb.default.svc.cluster.local:5432/silver_hot_data',
+  'table-name' = 'technical_indicators',
+  'username' = 'kdquang',
+  'password' = 'admin123',
+  'driver' = 'org.postgresql.Driver',
+  'sink.buffer-flush.max-rows' = '100',
+  'sink.buffer-flush.interval' = '2s'
+);
+
 -- 4. GỘP CHUNG LUỒNG THỰC THI (Quan trọng nhất)
 EXECUTE STATEMENT SET BEGIN
 
@@ -92,5 +111,24 @@ EXECUTE STATEMENT SET BEGIN
         ((LEAST(open_price, close_price) - low_price) >= 2 * ABS(close_price - open_price)
          AND (high_price - GREATEST(open_price, close_price)) <= 0.1 * ABS(close_price - open_price))
     );
+
+  -- Nhánh 3: SMA7 và SMA25
+  INSERT INTO technical_indicators_sink
+  SELECT
+    symbol,
+    open_time,
+    close_price,
+    AVG(close_price) OVER (
+      PARTITION BY symbol
+      ORDER BY open_time
+      ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+    ) AS sma7,
+    AVG(close_price) OVER (
+      PARTITION BY symbol
+      ORDER BY open_time
+      ROWS BETWEEN 24 PRECEDING AND CURRENT ROW
+    ) AS sma25
+  FROM binance_kline_with_watermark
+  WHERE is_closed = TRUE;
 
 END;
