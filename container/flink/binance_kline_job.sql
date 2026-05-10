@@ -82,6 +82,36 @@ CREATE TABLE technical_indicators_sink (
   'sink.buffer-flush.interval' = '1s'
 );
 
+-- 4. TẠO VIEW TẠM ĐỂ TÍNH TOÁN NỐI TIẾP (Giải quyết lỗi Over Agg)
+
+-- Bước 4.1: Tính SMA7 trước
+CREATE TEMPORARY VIEW sma7_calc_view AS
+SELECT 
+    symbol,
+    open_time,
+    close_price,
+    ts, -- Giữ lại trường thời gian để truyền cho bước sau
+    AVG(close_price) OVER (
+        PARTITION BY symbol 
+        ORDER BY ts 
+        ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+    ) AS sma7
+FROM binance_kline_with_watermark
+WHERE is_closed = TRUE;
+
+-- Bước 4.2: Dùng kết quả của SMA7 để tính tiếp SMA25
+CREATE TEMPORARY VIEW final_indicators_view AS
+SELECT 
+    symbol,
+    open_time,
+    close_price,
+    sma7,
+    AVG(close_price) OVER (
+        PARTITION BY symbol 
+        ORDER BY ts 
+        ROWS BETWEEN 24 PRECEDING AND CURRENT ROW
+    ) AS sma25
+FROM sma7_calc_view;
 
 -- 4. GỘP CHUNG LUỒNG THỰC THI (Quan trọng nhất)
 EXECUTE STATEMENT SET BEGIN
@@ -113,25 +143,14 @@ EXECUTE STATEMENT SET BEGIN
          AND (high_price - GREATEST(open_price, close_price)) <= 0.1 * ABS(close_price - open_price))
     );
 
-  -- Nhánh 3: Tính toán trung bình động (SMA7 & SMA25) bằng Sliding Window
+  -- Nhánh 3: Đẩy dữ liệu đã tính toán xong từ View vào Postgres
   INSERT INTO technical_indicators_sink
   SELECT 
-      symbol,
-      open_time,
-      close_price,
-      -- Tính SMA7 dựa trên window 7 nến (6 nến trước + nến hiện tại)
-      AVG(close_price) OVER (
-          PARTITION BY symbol 
-          ORDER BY ts 
-          ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
-      ) AS sma7,
-      -- Tính SMA25 dựa trên window 25 nến
-      AVG(close_price) OVER (
-          PARTITION BY symbol 
-          ORDER BY ts 
-          ROWS BETWEEN 24 PRECEDING AND CURRENT ROW
-      ) AS sma25
-  FROM binance_kline_with_watermark
-  WHERE is_closed = TRUE; -- Lưu ý: Chỉ tính khi nến đã đóng để dữ liệu không bị nhiễu
+      symbol, 
+      open_time, 
+      close_price, 
+      sma7, 
+      sma25 
+  FROM final_indicators_view;
 
 END;
