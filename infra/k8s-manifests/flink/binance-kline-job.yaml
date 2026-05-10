@@ -10,7 +10,6 @@ spec:
   
   flinkConfiguration:
     taskmanager.numberOfTaskSlots: "2"
-    
     #gcs
     google.cloud.auth.service.account.json.key.file: /etc/flink/gcp/gcs-key.json
     fs.gs.project.id: "datn-489915"
@@ -21,8 +20,6 @@ spec:
     execution.checkpointing.timeout: "3m"
     execution.checkpointing.tolerable-failed-checkpoints: "10"
     execution.checkpointing.mode: "EXACTLY_ONCE"
-    execution.checkpointing.min-pause: "5s"
-    execution.checkpointing.timeout: "1m"
     execution.checkpointing.max-concurrent-checkpoints: "1"
     execution.checkpointing.externalized-checkpoint-retention: "RETAIN_ON_CANCELLATION"
 
@@ -30,6 +27,7 @@ spec:
     state.backend.type: rocksdb
     state.backend.incremental: "true"
     state.backend.rocksdb.memory.managed: "true"
+    state.backend.rocksdb.checkpoint.transfer.thread.num: "1"
     state.checkpoints.dir: gs://flink-checkpoints-1773848181/checkpoints
 
     # HA
@@ -63,7 +61,7 @@ spec:
 
   taskManager:
     resource:
-      memory: "1024m"
+      memory: "2048m"
       cpu: 1
     podTemplate:
       spec:
