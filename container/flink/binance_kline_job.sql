@@ -63,6 +63,25 @@ CREATE TABLE pattern_alerts_sink (
   'sink.buffer-flush.max-rows' = '1' -- Alert cần ghi ngay lập tức
 );
 
+-- 4. BẢNG ĐÍCH 3 (Ghi Technical Indicators)
+CREATE TABLE technical_indicators_sink (
+  symbol STRING,
+  open_time BIGINT,
+  close_price DOUBLE,
+  sma7 DOUBLE,
+  sma25 DOUBLE,
+  PRIMARY KEY (symbol, open_time) NOT ENFORCED
+) WITH (
+  'connector' = 'jdbc',
+  'url' = 'jdbc:postgresql://timescaledb.default.svc.cluster.local:5432/silver_hot_data',
+  'table-name' = 'technical_indicators',
+  'username' = 'kdquang',
+  'password' = 'admin123',
+  'driver' = 'org.postgresql.Driver',
+  'sink.buffer-flush.max-rows' = '100', -- Flush nhanh hơn để Grafana hiện sớm
+  'sink.buffer-flush.interval' = '1s'
+);
+
 
 -- 4. GỘP CHUNG LUỒNG THỰC THI (Quan trọng nhất)
 EXECUTE STATEMENT SET BEGIN
@@ -93,5 +112,26 @@ EXECUTE STATEMENT SET BEGIN
         ((LEAST(open_price, close_price) - low_price) >= 2 * ABS(close_price - open_price)
          AND (high_price - GREATEST(open_price, close_price)) <= 0.1 * ABS(close_price - open_price))
     );
+
+  -- Nhánh 3: Tính toán trung bình động (SMA7 & SMA25) bằng Sliding Window
+  INSERT INTO technical_indicators_sink
+  SELECT 
+      symbol,
+      open_time,
+      close_price,
+      -- Tính SMA7 dựa trên window 7 nến (6 nến trước + nến hiện tại)
+      AVG(close_price) OVER (
+          PARTITION BY symbol 
+          ORDER BY ts 
+          ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+      ) AS sma7,
+      -- Tính SMA25 dựa trên window 25 nến
+      AVG(close_price) OVER (
+          PARTITION BY symbol 
+          ORDER BY ts 
+          ROWS BETWEEN 24 PRECEDING AND CURRENT ROW
+      ) AS sma25
+  FROM binance_kline_with_watermark
+  WHERE is_closed = TRUE; -- Lưu ý: Chỉ tính khi nến đã đóng để dữ liệu không bị nhiễu
 
 END;
