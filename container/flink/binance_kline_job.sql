@@ -114,7 +114,8 @@ SELECT
         PARTITION BY symbol 
         ORDER BY ts 
         ROWS BETWEEN 24 PRECEDING AND CURRENT ROW
-    ) AS sma25
+    ) AS sma25,
+    ts
 FROM sma7_calc_view;
 
 CREATE TEMPORARY VIEW base_stats_view AS
