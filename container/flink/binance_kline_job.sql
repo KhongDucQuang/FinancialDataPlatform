@@ -70,6 +70,10 @@ CREATE TABLE technical_indicators_sink (
   close_price DOUBLE,
   sma7 DOUBLE,
   sma25 DOUBLE,
+  rsi14 DOUBLE,        -- Thêm mới
+  macd DOUBLE,         -- Thêm mới
+  macd_signal DOUBLE,  -- Thêm mới
+  macd_hist DOUBLE,    -- Thêm mới
   PRIMARY KEY (symbol, open_time) NOT ENFORCED
 ) WITH (
   'connector' = 'jdbc',
@@ -113,6 +117,50 @@ SELECT
     ) AS sma25
 FROM sma7_calc_view;
 
+CREATE TEMPORARY VIEW base_stats_view AS
+SELECT 
+    symbol, open_time, close_price, sma7, sma25, ts,
+    close_price - LAG(close_price, 1) OVER (PARTITION BY symbol ORDER BY ts) AS price_diff,
+    AVG(close_price) OVER (PARTITION BY symbol ORDER BY ts ROWS BETWEEN 11 PRECEDING AND CURRENT ROW) AS sma12,
+    AVG(close_price) OVER (PARTITION BY symbol ORDER BY ts ROWS BETWEEN 25 PRECEDING AND CURRENT ROW) AS sma26
+FROM final_indicators_view;
+
+CREATE TEMPORARY VIEW step2_view AS
+SELECT 
+    symbol, open_time, close_price, sma7, sma25, ts,
+    CASE WHEN price_diff > 0 THEN price_diff ELSE 0 END AS gain,
+    CASE WHEN price_diff < 0 THEN ABS(price_diff) ELSE 0 END AS loss,
+    (sma12 - sma26) AS macd_line
+FROM base_stats_view;
+
+CREATE TEMPORARY VIEW step3_view AS
+SELECT 
+    symbol, open_time, close_price, sma7, sma25, ts, macd_line,
+    AVG(gain) OVER w14 AS avg_gain,
+    AVG(loss) OVER w14 AS avg_loss,
+    AVG(macd_line) OVER w9 AS macd_signal
+FROM step2_view
+WINDOW 
+    w14 AS (PARTITION BY symbol ORDER BY ts ROWS BETWEEN 13 PRECEDING AND CURRENT ROW),
+    w9 AS (PARTITION BY symbol ORDER BY ts ROWS BETWEEN 8 PRECEDING AND CURRENT ROW);
+
+CREATE TEMPORARY VIEW advanced_indicators_view AS
+SELECT 
+    symbol, open_time, close_price, sma7, sma25,
+    
+    -- Tính RSI 14
+    CASE 
+        WHEN avg_loss = 0 THEN 100.0 -- Đề phòng lỗi chia cho 0 khi giá chỉ tăng
+        ELSE 100.0 - (100.0 / (1.0 + (avg_gain / avg_loss))) 
+    END AS rsi14,
+    
+    -- Tính các thông số MACD
+    macd_line AS macd,
+    macd_signal,
+    (macd_line - macd_signal) AS macd_hist
+
+FROM step3_view;
+
 -- 4. GỘP CHUNG LUỒNG THỰC THI (Quan trọng nhất)
 EXECUTE STATEMENT SET BEGIN
 
@@ -150,7 +198,11 @@ EXECUTE STATEMENT SET BEGIN
       open_time, 
       close_price, 
       sma7, 
-      sma25 
-  FROM final_indicators_view;
+      sma25,
+      rsi14,
+      macd,
+      macd_signal,
+      macd_hist
+  FROM advanced_indicators_view;
 
 END;
