@@ -13,7 +13,7 @@ spec:
     #gcs
     google.cloud.auth.service.account.json.key.file: /etc/flink/gcp/gcs-key.json
     fs.gs.project.id: "datn-489915"
-    fs.gcs.stream.upload.buffer.size: 8388608
+    fs.gcs.stream.upload.buffer.size: "8388608"
 
     # checkpoint
     execution.checkpointing.interval: "60s"
