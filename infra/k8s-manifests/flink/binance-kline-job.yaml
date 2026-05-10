@@ -4,7 +4,7 @@ metadata:
   name: binance-kline-job 
   namespace: airflow
 spec:
-  image: khongducquang/flink:1.18-custom-v26
+  image: khongducquang/flink:1.18-custom-v27
   flinkVersion: v1_18
   serviceAccount: flink-operator-sa 
   
