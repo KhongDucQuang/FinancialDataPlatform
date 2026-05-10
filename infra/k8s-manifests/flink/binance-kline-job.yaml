@@ -46,6 +46,9 @@ spec:
     metrics.reporter.prom.port: "9249"
     metrics.reporter.prom.host: "0.0.0.0"
   
+    # table
+    table.exec.source.idle-timeout: "5s"
+
   podTemplate:
     spec:
       containers:
