@@ -75,4 +75,4 @@ spec:
     entryClass: com.mycompany.flink.SqlRunner
     args: ["/opt/flink/sql/binance_kline_job.sql"]
     parallelism: 2
-    upgradeMode: last-state
+    upgradeMode: stateless
