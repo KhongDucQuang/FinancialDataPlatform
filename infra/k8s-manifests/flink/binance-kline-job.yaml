@@ -16,7 +16,10 @@ spec:
     fs.gs.project.id: "datn-489915"
 
     # checkpoint
-    execution.checkpointing.interval: "10s"
+    execution.checkpointing.interval: "60s"
+    execution.checkpointing.min-pause: "20s"
+    execution.checkpointing.timeout: "3m"
+    execution.checkpointing.tolerable-failed-checkpoints: "10"
     execution.checkpointing.mode: "EXACTLY_ONCE"
     execution.checkpointing.min-pause: "5s"
     execution.checkpointing.timeout: "1m"
