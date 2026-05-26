@@ -15,7 +15,7 @@ CREATE TABLE binance_kline_with_watermark (
   'connector' = 'kafka',
   'topic' = 'binance_raw_kline',
   'properties.bootstrap.servers' = 'redpanda.default.svc.cluster.local:9092',
-  'properties.group.id' = 'flink-consumer-sink-v3', -- Đổi version để đọc lại từ đầu nếu muốn test cảnh báo cũ
+  'properties.group.id' = 'flink-consumer-sink-v4', -- Đổi version để đọc lại từ đầu nếu muốn test cảnh báo cũ
   'scan.startup.mode' = 'earliest-offset',        
   'format' = 'json',
   'json.fail-on-missing-field' = 'false',
