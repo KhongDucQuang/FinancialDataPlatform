@@ -30,12 +30,29 @@ with DAG(
     tags=["batch", "binance", "bronze", "gcs"],
 ) as dag:
 
-    scrape_binance_to_bronze = KubernetesPodOperator(
+        scrape_binance_to_bronze = KubernetesPodOperator(
         task_id="scrape_binance_to_bronze",
         name="scrape-binance-to-bronze",
         namespace="airflow",
         image=IMAGE,
         image_pull_policy="Always",
+
+        node_selector={
+            "kubernetes.io/hostname": "data-platform-recover",
+        },
+        tolerations=[
+            k8s.V1Toleration(
+                key="node-role.kubernetes.io/control-plane",
+                operator="Exists",
+                effect="NoSchedule",
+            ),
+            k8s.V1Toleration(
+                key="node-role.kubernetes.io/master",
+                operator="Exists",
+                effect="NoSchedule",
+            ),
+        ],
+
         arguments=[
             "--symbols", SYMBOLS,
             "--interval", INTERVAL,
@@ -61,8 +78,14 @@ with DAG(
             )
         ],
         container_resources=k8s.V1ResourceRequirements(
-            requests={"cpu": "250m", "memory": "512Mi"},
-            limits={"cpu": "1", "memory": "2Gi"},
+            requests={
+                "cpu": "50m",
+                "memory": "256Mi",
+            },
+            limits={
+                "cpu": "1",
+                "memory": "2Gi",
+            },
         ),
         get_logs=True,
         is_delete_operator_pod=True,
