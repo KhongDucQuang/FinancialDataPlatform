@@ -10,7 +10,7 @@ SYMBOLS = "BTCUSDT,ETHUSDT,BNBUSDT,ADAUSDT,SOLUSDT"
 INTERVAL = "1m"
 
 BRONZE_IMAGE = "khongducquang/binance-batch-scraper:v3"
-SILVER_IMAGE = "khongducquang/spark-iceberg-batch:v1"
+SILVER_IMAGE = "khongducquang/spark-iceberg-batch:v2"
 
 
 default_args = {
