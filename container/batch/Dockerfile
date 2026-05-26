@@ -8,6 +8,6 @@ RUN pip install --no-cache-dir \
     requests \
     google-cloud-storage
 
-COPY *.py /app/
+COPY ./src/batch/binance_historical_to_gcs.py /app/binance_historical_to_gcs.py
 
 ENTRYPOINT ["python", "-u", "/app/binance_historical_to_gcs.py"]

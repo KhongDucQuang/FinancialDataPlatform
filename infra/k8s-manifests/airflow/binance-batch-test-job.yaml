@@ -10,7 +10,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: scraper
-          image: khongducquang/binance-batch-scraper:v1
+          image: khongducquang/binance-batch-scraper:v3
           imagePullPolicy: Always
           args:
             - "--symbols"
