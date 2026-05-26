@@ -124,12 +124,12 @@ with DAG(
         volume_mounts=GCS_SECRET_VOLUME_MOUNT,
         container_resources=k8s.V1ResourceRequirements(
             requests={
-                "cpu": "100m",
-                "memory": "1Gi",
+                "cpu": "20m",
+                "memory": "512Mi",
             },
             limits={
-                "cpu": "2",
-                "memory": "4Gi",
+                "cpu": "1",
+                "memory": "2Gi",
             },
         ),
         get_logs=True,
