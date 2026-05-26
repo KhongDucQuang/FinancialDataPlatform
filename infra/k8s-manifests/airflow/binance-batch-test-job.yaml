@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: binance-batch-test
+  namespace: airflow
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: scraper
+          image: khongducquang/binance-batch-scraper:v1
+          imagePullPolicy: Always
+          args:
+            - "--symbols"
+            - "BTCUSDT,ETHUSDT,BNBUSDT,ADAUSDT,SOLUSDT"
+            - "--interval"
+            - "1m"
+            - "--start-date"
+            - "2026-05-24"
+            - "--end-date"
+            - "2026-05-25"
+            - "--bucket"
+            - "datn-financial-datalake-1773848181"
+            - "--prefix"
+            - "bronze/binance/kline"
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /var/secrets/google/gcs-key.json
+          volumeMounts:
+            - name: gcs-key
+              mountPath: /var/secrets/google
+              readOnly: true
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+      volumes:
+        - name: gcs-key
+          secret:
+            secretName: batch-gcs-key

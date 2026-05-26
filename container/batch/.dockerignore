@@ -1,0 +1,10 @@
+.git
+.venv
+.venv-batch
+__pycache__/
+*.pyc
+*.log
+*.json
+.env
+.DS_Store
+.ipynb_checkpoints/
