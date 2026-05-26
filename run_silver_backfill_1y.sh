@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-START_DATE="2025-05-26"
+START_DATE="2026-04-26"
 END_DATE="2026-05-26"   # exclusive, không chạy ngày này
 NAMESPACE="airflow"
 TEMPLATE="infra/k8s-manifests/airflow/spark-bronze-to-silver-backfill.yaml"
