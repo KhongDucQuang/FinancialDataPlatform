@@ -8,7 +8,7 @@ from kubernetes.client import models as k8s
 DATALAKE_BUCKET = "datn-financial-datalake-1773848181"
 SYMBOLS = "BTCUSDT,ETHUSDT,BNBUSDT,ADAUSDT,SOLUSDT"
 INTERVAL = "1m"
-IMAGE = "khongducquang/binance-batch-scraper:v2"
+IMAGE = "khongducquang/binance-batch-scraper:v3"
 
 
 default_args = {
