@@ -216,11 +216,11 @@ def refresh_hot_speed_layer(conn, hot_lookback_hours):
     SELECT DISTINCT
         symbol,
         CASE
-            WHEN symbol LIKE '%USDT' THEN REPLACE(symbol, 'USDT', '')
+            WHEN symbol LIKE '%%USDT' THEN REPLACE(symbol, 'USDT', '')
             ELSE symbol
         END AS base_asset,
         CASE
-            WHEN symbol LIKE '%USDT' THEN 'USDT'
+            WHEN symbol LIKE '%%USDT' THEN 'USDT'
             ELSE NULL
         END AS quote_asset
     FROM public.binance_kline
@@ -307,11 +307,11 @@ def refresh_technical_indicators(conn, hot_lookback_hours):
     SELECT DISTINCT
         symbol,
         CASE
-            WHEN symbol LIKE '%USDT' THEN REPLACE(symbol, 'USDT', '')
+            WHEN symbol LIKE '%%USDT' THEN REPLACE(symbol, 'USDT', '')
             ELSE symbol
         END AS base_asset,
         CASE
-            WHEN symbol LIKE '%USDT' THEN 'USDT'
+            WHEN symbol LIKE '%%USDT' THEN 'USDT'
             ELSE NULL
         END AS quote_asset
     FROM public.technical_indicators
@@ -390,11 +390,11 @@ def refresh_pattern_alerts(conn, hot_lookback_hours):
     SELECT DISTINCT
         symbol,
         CASE
-            WHEN symbol LIKE '%USDT' THEN REPLACE(symbol, 'USDT', '')
+            WHEN symbol LIKE '%%USDT' THEN REPLACE(symbol, 'USDT', '')
             ELSE symbol
         END AS base_asset,
         CASE
-            WHEN symbol LIKE '%USDT' THEN 'USDT'
+            WHEN symbol LIKE '%%USDT' THEN 'USDT'
             ELSE NULL
         END AS quote_asset
     FROM public.pattern_alerts
