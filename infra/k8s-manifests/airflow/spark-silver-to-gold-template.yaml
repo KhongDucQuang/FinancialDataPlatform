@@ -22,7 +22,7 @@ spec:
 
       containers:
         - name: spark-silver-to-gold
-          image: khongducquang/spark-gold-star:v1
+          image: khongducquang/spark-gold-star:v2
           imagePullPolicy: Always
           args:
             - "--bucket"

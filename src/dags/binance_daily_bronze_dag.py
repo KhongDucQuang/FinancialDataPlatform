@@ -11,7 +11,7 @@ INTERVAL = "1m"
 
 BRONZE_IMAGE = "khongducquang/binance-batch-scraper:v3"
 SILVER_IMAGE = "khongducquang/spark-iceberg-batch:v2"
-GOLD_IMAGE = "khongducquang/spark-gold-star:v1"
+GOLD_IMAGE = "khongducquang/spark-gold-star:v2"
 
 default_args = {
     "owner": "kdquang",
