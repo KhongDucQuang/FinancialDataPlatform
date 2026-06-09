@@ -11,7 +11,7 @@ INTERVAL = "1m"
 
 BRONZE_IMAGE = "khongducquang/binance-batch-scraper:v3"
 SILVER_IMAGE = "khongducquang/spark-iceberg-batch:v2"
-
+GOLD_IMAGE = "khongducquang/spark-gold-star:v1"
 
 default_args = {
     "owner": "kdquang",
@@ -139,4 +139,88 @@ with DAG(
         log_events_on_failure=True,
     )
 
-    scrape_binance_to_bronze >> bronze_to_silver
+    silver_to_gold = KubernetesPodOperator(
+        task_id="silver_to_gold_star",
+        name="silver-to-gold-star",
+        namespace="airflow",
+        image=GOLD_IMAGE,
+        image_pull_policy="Always",
+        node_selector=COMMON_NODE_SELECTOR,
+        tolerations=COMMON_TOLERATIONS,
+        arguments=[
+            "--bucket", DATALAKE_BUCKET,
+            "--process-date", "{{ macros.ds_add(ds, -1) }}",
+            "--interval", INTERVAL,
+            "--hot-lookback-hours", "48",
+        ],
+        env_vars=[
+            k8s.V1EnvVar(
+                name="GOOGLE_APPLICATION_CREDENTIALS",
+                value="/var/secrets/google/gcs-key.json",
+            ),
+            k8s.V1EnvVar(
+                name="DB_HOST",
+                value_from=k8s.V1EnvVarSource(
+                    secret_key_ref=k8s.V1SecretKeySelector(
+                        name="gold-db-secret",
+                        key="DB_HOST",
+                    )
+                ),
+            ),
+            k8s.V1EnvVar(
+                name="DB_PORT",
+                value_from=k8s.V1EnvVarSource(
+                    secret_key_ref=k8s.V1SecretKeySelector(
+                        name="gold-db-secret",
+                        key="DB_PORT",
+                    )
+                ),
+            ),
+            k8s.V1EnvVar(
+                name="DB_NAME",
+                value_from=k8s.V1EnvVarSource(
+                    secret_key_ref=k8s.V1SecretKeySelector(
+                        name="gold-db-secret",
+                        key="DB_NAME",
+                    )
+                ),
+            ),
+            k8s.V1EnvVar(
+                name="DB_USER",
+                value_from=k8s.V1EnvVarSource(
+                    secret_key_ref=k8s.V1SecretKeySelector(
+                        name="gold-db-secret",
+                        key="DB_USER",
+                    )
+                ),
+            ),
+            k8s.V1EnvVar(
+                name="DB_PASSWORD",
+                value_from=k8s.V1EnvVarSource(
+                    secret_key_ref=k8s.V1SecretKeySelector(
+                        name="gold-db-secret",
+                        key="DB_PASSWORD",
+                    )
+                ),
+            ),
+        ],
+        volumes=GCS_SECRET_VOLUME,
+        volume_mounts=GCS_SECRET_VOLUME_MOUNT,
+        container_resources=k8s.V1ResourceRequirements(
+            requests={
+                "cpu": "1m",
+                "memory": "512Mi",
+            },
+            limits={
+                "cpu": "1",
+                "memory": "2Gi",
+            },
+        ),
+        get_logs=True,
+        is_delete_operator_pod=True,
+        in_cluster=True,
+        startup_timeout_seconds=600,
+        log_events_on_failure=True,
+    )
+
+    scrape_binance_to_bronze >> bronze_to_silver >> silver_to_gold

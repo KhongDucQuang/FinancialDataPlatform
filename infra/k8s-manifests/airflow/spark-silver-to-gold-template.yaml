@@ -1,0 +1,87 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: spark-s2g-${PROCESS_DATE_COMPACT}
+  namespace: airflow
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+
+      nodeSelector:
+        kubernetes.io/hostname: data-platform-recover
+
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "node-role.kubernetes.io/master"
+          operator: "Exists"
+          effect: "NoSchedule"
+
+      containers:
+        - name: spark-silver-to-gold
+          image: khongducquang/spark-gold-star:v1
+          imagePullPolicy: Always
+          args:
+            - "--bucket"
+            - "datn-financial-datalake-1773848181"
+            - "--process-date"
+            - "${PROCESS_DATE}"
+            - "--interval"
+            - "1m"
+            - "--hot-lookback-hours"
+            - "48"
+
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /var/secrets/google/gcs-key.json
+
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: gold-db-secret
+                  key: DB_HOST
+
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: gold-db-secret
+                  key: DB_PORT
+
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: gold-db-secret
+                  key: DB_NAME
+
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: gold-db-secret
+                  key: DB_USER
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gold-db-secret
+                  key: DB_PASSWORD
+
+          volumeMounts:
+            - name: gcs-key
+              mountPath: /var/secrets/google
+              readOnly: true
+
+          resources:
+            requests:
+              cpu: "1m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+
+      volumes:
+        - name: gcs-key
+          secret:
+            secretName: batch-gcs-key
